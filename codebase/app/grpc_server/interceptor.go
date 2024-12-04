@@ -76,6 +76,7 @@ func (i *interceptor) unaryTracerInterceptor(ctx context.Context, req any, info 
 		trace.Finish(tracer.FinishWithError(err))
 	}()
 
+	trace.SetTag("resource.name", info.FullMethod)
 	trace.SetTag("method", info.FullMethod)
 	trace.Log("metadata", meta)
 	if reqBody := candihelper.ToBytes(req); len(reqBody) < i.opt.jaegerMaxPacketSize { // limit response body size to 65000 bytes (if higher tracer cannot show root span)
@@ -159,6 +160,7 @@ func (i *interceptor) streamTracerInterceptor(srv any, stream grpc.ServerStream,
 		trace.Finish(tracer.FinishWithError(err))
 	}()
 
+	trace.SetTag("resource.name", info.FullMethod)
 	trace.SetTag("method", info.FullMethod)
 	trace.Log("metadata", meta)
 	err = handler(srv, &wrappedServerStream{ServerStream: stream, wrappedContext: ctx})
